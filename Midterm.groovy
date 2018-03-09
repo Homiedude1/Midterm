@@ -37,7 +37,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-class Midterm {
+public class Midterm {
 
     public static void main(String[] args) throws IOException {
         String courseID;
@@ -61,65 +61,49 @@ class Midterm {
         String beginData;
         String endDate;
         String url;
-        showMenu();
-        Connection.Responce response =
-                Jsoup.connect("https://aps2.missouriwestern.edu/schedule/?tck=201910")
-                        .userAgent("Mozilla/5.0")
-                        .timeout(10 * 1000)
-                        .method(Connection.Method.POST)
-                        .data("course_number", "CSC")
-                        .data("txtloginpassword", "YOUR_PASSWORD")
-                        .data("random", "123342343")
-                        .data("task", "login")
-                        .data("destination", "/welcome")
-                        .followRedirects(true)
-                        .execute();
-
-        //parse the document from response
-        Document document = response.parse();
-        for (Element table : document.select("tr")) {
-            for (Element row : table.select("td")) {
-                String detail = document.select("detail_row")
-                System.out.println(detail)
-
-
-            }
-        }
+        String dept = "BIO"
+        boolean writeToDb = false
+        showMenu()
+        getSections(dept,semester,writeToDb)
     }
 
 
     private static void showMenu() {
-        char ch
+        char ch = "x";
+
         while (ch != 'Q') {
-        }
-        System.out.println(" A. Erase and Build the Subjects (Discipline) table");
-        System.out.println(" B. Erase and Build the Departments table");
-        System.out.println(" Q. Quit");
-        Scanner input = new Scanner(System.in);
-        System.out.println("Type a Letter: ");
-        String s = input.next().toUpperCase().trim();
-        ch = (s.length() > 0) ? s.charAt(0) : 'x';
-        switch (ch) {
-            case 'A':
-                eraseSubjectsTable();
-                break;
-            case 'B':
-                eraseDepartmentsTable();
-                break;
-            case 'Q':
-                break;
-            default:
-                System.out.println("Type a letter from the menu!");
+            System.out.println(" A. Erase and Build the Subjects (Discipline) table");
+            System.out.println(" B. Erase and Build the Departments table");
+            System.out.println(" Q. Quit");
+            Scanner input = new Scanner(System.in);
+            System.out.println("Type a Letter: ");
+            String s = input.next().toUpperCase().trim();
+            ch = (s.length() > 0) ? s.charAt(0) : 'x';
+            switch (ch) {
+                case 'A':
+                    eraseSubjectsTable();
+                    break;
+                case 'B':
+                    eraseDepartmentsTable();
+                    break;
+                case 'Q':
+                    break;
+                default:
+                    System.out.println("Type a letter from the menu!");
+            }
         }
     }
+    public static void eraseSubjectsTable(){}
+    public static void eraseDepartmentsTable(){}
 
 }
 class GetSections{
+
     static def getSections(dept,semester,writeToDb){
         println "Processing $dept for semester $semester. Writing to database? $writeToDb"
         def baseURL = "https://aps2.missouriwester.edu/schedule/"
-        document doc = Jsoup.parse(newFile("Csmp.html"),"UTF-8",baseURL)
-        Elements rows = doc.select("tr")
+        Document document = Jsoup.parse(newFile("Csmp.html"),"UTF-8",baseURL)
+        Elements rows = document.select("tr")
         println("found ${rows.size()} rows");
         if(rows.size() > 4){
             rows.each{row->
@@ -160,7 +144,7 @@ class GetSections{
                     sec.term = ""
                     Elements tags = row.select("*")
                     tags.each{tag->
-                    className = tag.attr("class")).toString()
+                    className = tag.attr("class").toString()
                     switch(className) {
                         case "corse_messages":
                             sec.messages += tag.text().trim()
@@ -168,7 +152,7 @@ class GetSections{
                         case "course_ends":
                             def s = tag.text();
                             sec.endDate = s.drop("Course End: ".length());
-                            sec.endDate = (s =~ /\d/\d+/\/\d+/)[0]
+                            sec.endDate = (s =~ /\d\/d+\/\d+/)[0]
                         sec.endDate = sec.endDate.trim();
                             println("END Date: ${sec.endDate}")
                             break;
@@ -187,5 +171,6 @@ class GetSections{
                 }
             }
         }
+    }
     }
 }
