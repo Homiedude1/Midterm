@@ -125,25 +125,25 @@ class GetSections{
             rows.each{row->
                 def className = row.attr("class")
                 Element cells = row.select("td");
-                if(className == "list_row"){
-                    if(sec != null){// would write to database here
+                if(className == "list_row") {
+                    if (sec != null) {// would write to database here
                         println "Section: $sec"
                     }
                     def cellCount = cells.size()
-                    switch(cellCount){
+                    switch (cellCount) {
                         case 10:
-                        //sec = new Section();
-                        sec.department = semester;
-                        sec.crn = cells.get(0).text().trim()
-                        def s = cells.get(1).text().trim()
-                        println "Corse is $a"
-                        sec.discipline = s.take(3)
-                        sec.corseNumber = s.drop(3)
-                        println("Discipline is ${sec.discipline} ${sec.courseNumber}")
-                        sec.instructor = cells[9].text().trim
-                        println("instructor ${sec.instructor}")
-                        sec.room = cells[8].text().trim()
-                        break;
+                            //sec = new Section();
+                            sec.department = semester;
+                            sec.crn = cells.get(0).text().trim()
+                            def s = cells.get(1).text().trim()
+                            println "Corse is $a"
+                            sec.discipline = s.take(3)
+                            sec.corseNumber = s.drop(3)
+                            println("Discipline is ${sec.discipline} ${sec.courseNumber}")
+                            sec.instructor = cells[9].text().trim
+                            println("instructor ${sec.instructor}")
+                            sec.room = cells[8].text().trim()
+                            break;
                         case 5:
                             sec.room += "|" + cells[3].text().trim()
                             break;
@@ -152,6 +152,37 @@ class GetSections{
                             System.exit(1);
 
 
+
+                    }
+                }
+                else if(className == "detail_row"){
+                    sec.messages = ""
+                    sec.term = ""
+                    Elements tags = row.select("*")
+                    tags.each{tag->
+                    className = tag.attr("class")).toString()
+                    switch(className) {
+                        case "corse_messages":
+                            sec.messages += tag.text().trim()
+                            break;
+                        case "course_ends":
+                            def s = tag.text();
+                            sec.endDate = s.drop("Course End: ".length());
+                            sec.endDate = (s =~ /\d/\d+/\/\d+/)[0]
+                        sec.endDate = sec.endDate.trim();
+                            println("END Date: ${sec.endDate}")
+                            break;
+                        case "course_seats":
+                            def contents = tag.text();
+                            contents.replace("<br />"," ")
+                            String[] parts = contents.split(/\s+/)
+                            if(parts.length> 6){
+                                def max = parts[2]
+                                def available = parts[6]
+                                sec.maximumEntrollment = Integer.parseInt(available)
+                                println "Seats: %{sec.maximumEntrollment} and ${sec.seatsAvailable}"
+
+                    }
                     }
                 }
             }
