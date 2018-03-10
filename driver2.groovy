@@ -5,5 +5,6 @@ class driver2 {
         //PartB.clearTable(SummaryReport.connect())
         SummaryReport.makeSummaryReport("CSC","discipline")
         SummaryReport.makeSummaryReport("CSMP","department")
+        SummaryReport.makeSummaryReport("CSMP","instructor")
     }
 }
