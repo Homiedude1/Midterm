@@ -1,10 +1,17 @@
-import java.sql.Statement
-import org.jsoup.Connection
+package edu.missouriwestern.blessing.CSC346
+
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
+import java.sql.Statement
+
 class PartB {
+    static def clearTable(java.sql.Connection conn){
+       def queryString = "DELETE FROM sections"
+        java.sql.Statement stmt = conn.createStatement()
+        stmt.execute(queryString)
+    }
     static def writeToDB(java.sql.Connection conn, Section sec) {
         def fields = "courseID, department, crn, discipline, courseNumber, section, type, title," +
                 " hours, days, time, room, instructor, maximumEnrollment, seatsAvailable, message, term, beginDate, " +
@@ -14,7 +21,7 @@ class PartB {
                 "$sec.maximumEnrollment, $sec.seatsAvailable, $sec.message, $sec.term, $sec.beginDate, $sec.endDate, $sec.url";
         valueString = valueString.replaceALL(/%/, "\\%")
         def queryString = "INSERT INTO sections ($fields) values ($valueString)"
-        Statement stmt = conn.createStatment()
+        java.sql.Statement stmt = conn.createStatement()
         stmt.executeUpdate(queryString)
     }
 
@@ -24,9 +31,9 @@ class PartB {
 
         Document doc = null;
 
-        /*Connection.Response response = Jsoup.connect(baseURL)
+        org.jsoup.Connection.Response response = Jsoup.connect(baseURL)
         .timeout(60 * 1000)
-        .method(Connection.Method.POST)
+        .method(org.jsoup.Connection.Method.POST)
         .data("course_number","")
         .data("subject","ALL")
         .data("department", department)
@@ -36,8 +43,9 @@ class PartB {
         .execute();
 
         doc = response.parse()
-        println(doc)*/
-        doc = Jsoup.parse(new File(department + ".html"), "UTF-8")
+        println(doc)
+
+        //doc = Jsoup.parse(new File(department + ".html"), "UTF-8")
         Elements rows = doc.select("tr")
         println("There are ${rows.size()} rows")
         if (rows.size() > 4) {
@@ -49,7 +57,7 @@ class PartB {
                 }
                 if (className == "list_row") {
                     if (sec != null) {
-                        println(sec) //database add
+                        writeToDB(SQLiteConnector.connect(),sec)
 
                     }
                     def cellCount = cells.size()
@@ -130,6 +138,6 @@ class PartB {
                 }
             }
         }
-        //write to database
+        writeToDB(SQLiteConnector.connect(),sec)
     }
 }

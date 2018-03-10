@@ -1,3 +1,5 @@
+package edu.missouriwestern.blessing.CSC346;
+
 public class Section {
     String department;
     String crn;
