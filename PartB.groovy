@@ -22,11 +22,11 @@ class PartB {
                 "'$sec.fees','$sec.feeTitle','$sec.feeType','$sec.url'"
         valueString = valueString.replaceAll(/%/, "\\%")
         def queryString = "INSERT INTO sections ($fields) values ($valueString)"
-        println(queryString)
+        //println(queryString)
         java.sql.Statement stmt = conn.createStatement()
-        println ("Made the statement")
+        //println ("Made the statement")
         stmt.executeUpdate(queryString)
-        println("Executed the query")
+        //println("Executed the query")
     }
 
     static def getSections(String department, java.sql.Connection conn) {
@@ -47,7 +47,7 @@ class PartB {
         .execute();
 
         doc = response.parse()
-        println(doc)
+        //println(doc)
 
         //doc = Jsoup.parse(new File(department + ".html"), "UTF-8")
         Elements rows = doc.select("tr")
@@ -56,9 +56,7 @@ class PartB {
             rows.each { row ->
                 def className = row.attr("class")
                 Elements cells = row.select("td")
-                cells.each { cell ->
-                    //println(cell)
-                }
+                Elements links = doc.select(".list_row a[href]")
                 if (className == "list_row") {
                     if (sec != null) {
                         writeToDB(conn,sec)
@@ -67,7 +65,7 @@ class PartB {
                     def cellCount = cells.size()
                     switch(cellCount) {
                         case 10:
-                            println(cells)
+                            //println(cells)
                             sec = new Section ()
                             sec.department = department
                             sec.crn = cells [ 0 ].text ().trim ()
@@ -84,7 +82,11 @@ class PartB {
                             sec.time = cells [7].text().trim()
                             sec.room = cells[8].text().trim()
                             sec.instructor = cells[9].text().trim()
-                            sec.url = cells[1].absUrl("href")
+                            for (int i = 0; i < links.size(); i++){
+                                if (links [i].text() == sec.courseID)
+                                    sec.url = links[i].attr("abs:href")
+                            }
+
 
                             break
                         case 5:
@@ -108,12 +110,12 @@ class PartB {
                                 feetxt = feetxt.replaceAll("\\(.*?\\)","")
                                 String []contents = feetxt.split(/\s+/)
                                 sec.fees = Double.parseDouble(contents[contents.length-2])
-                                sec.feeType = contents[contents.length-1]
+                                sec.feeType = contents[contents.length-1].trim()
                                 String feeTitle = contents[0..contents.length-3]
                                 feeTitle = feeTitle.replaceAll(",","")
                                 feeTitle = feeTitle.replaceAll("]","")
                                 feeTitle = feeTitle.replaceAll("\\[","")
-                                println(feeTitle)
+                                //println(feeTitle)
                             case "course_messages":
                                 sec.message += tag.text().trim()
                                 break
