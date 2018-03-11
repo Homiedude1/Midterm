@@ -63,8 +63,8 @@ public class Midterm {
         String url;
         String dept = "BIO"
         boolean writeToDb = false
-        showMenu()
-        getSections(dept,semester,writeToDb)
+        //showMenu()
+        getSections()
     }
 
 
@@ -97,10 +97,22 @@ public class Midterm {
     public static void eraseDepartmentsTable(){}
 
 }
+
+class Utility{
+    static def clearRecordsFromDB(){
+        String dbFile = "jdbc:sqlite:schedule.db"
+        Connection conn = DriverManager.getConnection(dbFile)
+        def queryString="DELETE FROM sections"
+        Statement stmt = conn.createStatement()
+        stmt.executeUpdate(queryString)
+        conn.close()
+
+    }
+}
 class GetSections{
 
-    static def getSections(dept,semester,writeToDb){
-        println "Processing $dept for semester $semester. Writing to database? $writeToDb"
+    static def getSections(){
+        println "Reteriving Subject and Departments"
         def baseURL = "https://aps2.missouriwester.edu/schedule/"
         Document document = Jsoup.parse(newFile("Csmp.html"),"UTF-8",baseURL)
         Elements rows = document.select("tr")

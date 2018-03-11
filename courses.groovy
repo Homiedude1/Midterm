@@ -50,6 +50,7 @@ class courses {
             if (tempx.contains(temp)) {
                 tempx[i] = temp
             }
+            // rest of code is just get the coarse then strip the numbers compare if .contains add all not null values into supartments
                 //int x=0;
                 //subpartments[i] = departments[x] + tempx[x]
                 //x++;
