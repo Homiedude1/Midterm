@@ -12,11 +12,11 @@ public class SQLiteConnector {
     /**
      * Connect to a sample database
      */
-    public static Connection connect(){
-        Connection conn = null;
+    public static java.sql.Connection connect(String loc){
+        java.sql.Connection conn = null;
         try {
             // db parameters
-            String url = "jdbc:sqlite:C:/Users/etern/IdeaProjects/MidtermPersonB/src/main/java/edu/missouriwestern/blessing/CSC346/schedule.db";
+            String url = "jdbc:sqlite:" + loc;
             // create a connection to the database
             conn = DriverManager.getConnection(url);
             System.out.println("Connection successful");

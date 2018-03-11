@@ -15,21 +15,25 @@ class PartB {
     static def writeToDB(java.sql.Connection conn, Section sec) {
         def fields = "courseID, department, crn, discipline, courseNumber, section, type, title," +
                 " hours, days, time, room, instructor, maximumEnrollment, seatsAvailable, message, term, beginDate, " +
-                "endDate, fees, feeTitle, feeType url";
-        def valueString = "$sec.courseID, $sec.department, $sec.crn, $sec.discipline, $sec.courseNumber," +
-                " $sec.section, $sec.type, $sec.title, $sec.hours, $sec.days, $sec.time, $sec.room, $sec.instructor, " +
-                "$sec.maximumEnrollment, $sec.seatsAvailable, $sec.message, $sec.term, $sec.beginDate, $sec.endDate, $sec.url";
-        valueString = valueString.replaceALL(/%/, "\\%")
+                "endDate, fees, feeTitle, feeType, url"
+        def valueString = "'$sec.courseID', '$sec.department', '$sec.crn', '$sec.discipline', '$sec.courseNumber'," +
+                " '$sec.section', '$sec.type', '$sec.title', '$sec.hours', '$sec.days', '$sec.time', '$sec.room', '$sec.instructor', " +
+                "'$sec.maximumEnrollment', '$sec.seatsAvailable', '$sec.message', '$sec.term', '$sec.beginDate', '$sec.endDate',"+
+                "'$sec.fees','$sec.feeTitle','$sec.feeType','$sec.url'"
+        valueString = valueString.replaceAll(/%/, "\\%")
         def queryString = "INSERT INTO sections ($fields) values ($valueString)"
+        println(queryString)
         java.sql.Statement stmt = conn.createStatement()
+        println ("Made the statement")
         stmt.executeUpdate(queryString)
+        println("Executed the query")
     }
 
-    static def getSections(String department) {
+    static def getSections(String department, java.sql.Connection conn) {
         Section sec = null
         def baseURL = "https://aps2.missouriwestern.edu/schedule/Default.asp?tck=201910"
 
-        Document doc = null;
+        Document doc = null
 
         org.jsoup.Connection.Response response = Jsoup.connect(baseURL)
         .timeout(60 * 1000)
@@ -57,12 +61,13 @@ class PartB {
                 }
                 if (className == "list_row") {
                     if (sec != null) {
-                        writeToDB(SQLiteConnector.connect(),sec)
+                        writeToDB(conn,sec)
 
                     }
                     def cellCount = cells.size()
                     switch(cellCount) {
                         case 10:
+                            println(cells)
                             sec = new Section ()
                             sec.department = department
                             sec.crn = cells [ 0 ].text ().trim ()
@@ -79,6 +84,7 @@ class PartB {
                             sec.time = cells [7].text().trim()
                             sec.room = cells[8].text().trim()
                             sec.instructor = cells[9].text().trim()
+                            sec.url = cells[1].absUrl("href")
 
                             break
                         case 5:
@@ -138,6 +144,6 @@ class PartB {
                 }
             }
         }
-        writeToDB(SQLiteConnector.connect(),sec)
+        writeToDB(conn,sec)
     }
 }
