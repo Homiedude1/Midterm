@@ -27,11 +27,11 @@ public class SummaryReport {
     }
 
     private static void buildInstructor(String param) {
-        String query = "SELECT distinct(instructor), courseID, days, time, room FROM sections WHERE department LIKE '"
-                +param+"' ORDER BY instructor";
+        String query = "SELECT instructor, courseID, days, time, room, department FROM sections ORDER BY department, instructor";
         TextColumnBuilder<String> instructorColumn = col.column("Instructor","instructor",type.stringType());
         ColumnGroupBuilder instructorGroup = grp.group(instructorColumn).setTitleWidth(60).setHeaderLayout(GroupHeaderLayout.TITLE_AND_VALUE)
                 .showColumnHeaderAndFooter();
+        TextColumnBuilder<String> departmentColumn = col.column("Department","department",type.stringType());
 
         try{
             report().setShowColumnTitle(false)
@@ -40,6 +40,7 @@ public class SummaryReport {
                             col.column("Days", "days",type.stringType()),
                             col.column("Times","time",type.stringType()),
                             col.column("Room","room",type.stringType()))
+                    .groupBy(departmentColumn)
                     .groupBy(instructorGroup)
                     .setDataSource(query,SQLiteConnector.connect())
                     .show();
