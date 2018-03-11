@@ -22,11 +22,11 @@ public class SummaryReport {
             buildDept(param);
             } 
         else if(pType.toLowerCase().equals("instructor")){
-            buildInstructor(param);
+            buildInstructor();
         }
     }
 
-    private static void buildInstructor(String param) {
+    private static void buildInstructor() {
         String query = "SELECT instructor, courseID, days, time, room, department FROM sections ORDER BY department, instructor";
         TextColumnBuilder<String> instructorColumn = col.column("Instructor","instructor",type.stringType());
         ColumnGroupBuilder instructorGroup = grp.group(instructorColumn).setTitleWidth(60).setHeaderLayout(GroupHeaderLayout.TITLE_AND_VALUE)
